@@ -1,14 +1,113 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <!-- Primary Meta Tags -->
+    <title>Count Me In - Hệ thống xếp hàng bài hát cho Karaoke | Song Queue Management</title>
+    <meta name="title" content="Count Me In - Hệ thống xếp hàng bài hát cho Karaoke | Song Queue Management" />
+    <meta name="description" content="Quản lý hàng chờ bài hát dễ dàng cho karaoke, open mic và jam session. Tạo phòng, chia sẻ mã QR, để khách tự đăng ký bài hát. Free & Easy song queue for karaoke nights." />
+    <meta name="keywords" content="karaoke, song queue, hàng chờ bài hát, karaoke queue, open mic, jam session, QR code, quản lý karaoke, karaoke manager, song request" />
+    <meta name="author" content="Count Me In" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="Vietnamese, English" />
+    <link rel="canonical" href="https://kramerlee.github.io/countmein/" />
+    
+    <!-- Theme & PWA -->
     <meta name="theme-color" content="#e85d04" />
-    <meta name="description" content="Count Me In - Song queue management for karaoke nights, open mics, and jam sessions" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <title>Count Me In</title>
+    <meta name="apple-mobile-web-app-title" content="Count Me In" />
+    <meta name="application-name" content="Count Me In" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://kramerlee.github.io/countmein/" />
+    <meta property="og:title" content="Count Me In - Hệ thống xếp hàng bài hát cho Karaoke" />
+    <meta property="og:description" content="Quản lý hàng chờ bài hát dễ dàng cho karaoke, open mic và jam session. Tạo phòng, chia sẻ mã QR, để khách tự đăng ký bài hát." />
+    <meta property="og:image" content="https://kramerlee.github.io/countmein/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:site_name" content="Count Me In" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://kramerlee.github.io/countmein/" />
+    <meta property="twitter:title" content="Count Me In - Hệ thống xếp hàng bài hát cho Karaoke" />
+    <meta property="twitter:description" content="Quản lý hàng chờ bài hát dễ dàng cho karaoke, open mic và jam session. Tạo phòng, chia sẻ mã QR, để khách tự đăng ký bài hát." />
+    <meta property="twitter:image" content="https://kramerlee.github.io/countmein/og-image.png" />
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Count Me In",
+      "alternateName": "Karaoke Queue Manager",
+      "url": "https://kramerlee.github.io/countmein/",
+      "description": "Hệ thống xếp hàng bài hát cho karaoke, open mic và jam session. Song queue management for karaoke nights.",
+      "applicationCategory": "EntertainmentApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Create karaoke rooms with unique codes",
+        "Share QR codes for easy guest access",
+        "Real-time song queue management",
+        "Track song status (pending, next, ongoing, completed)",
+        "YouTube link support",
+        "Mobile-first responsive design",
+        "Vietnamese and English language support"
+      ],
+      "inLanguage": ["vi", "en"],
+      "author": {
+        "@type": "Organization",
+        "name": "Count Me In"
+      }
+    }
+    </script>
+    
+    <!-- FAQ Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Count Me In là gì?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Count Me In là ứng dụng web miễn phí giúp quản lý hàng chờ bài hát cho karaoke, open mic và jam session. Host tạo phòng, chia sẻ mã QR, khách quét mã và đăng ký bài hát."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Làm sao để tạo phòng karaoke?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Chỉ cần bấm 'Tạo Phòng' trên trang chủ. Hệ thống sẽ tạo mã phòng và mã QR để bạn chia sẻ với khách."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Khách tham gia phòng như thế nào?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Khách có thể quét mã QR hoặc nhập mã phòng trên trang chủ để tham gia và đăng ký bài hát."
+          }
+        }
+      ]
+    }
+    </script>
+    
     <!-- GitHub Pages SPA redirect handler -->
     <script>
       (function(l) {
@@ -26,5 +125,9 @@
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
+    
+    <!-- Cloudflare Web Analytics -->
+    <!-- Replace CLOUDFLARE_BEACON_TOKEN with your actual token from Cloudflare dashboard -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "CLOUDFLARE_BEACON_TOKEN"}'></script>
   </body>
 </html>

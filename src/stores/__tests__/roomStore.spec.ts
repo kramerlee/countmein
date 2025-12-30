@@ -4,7 +4,9 @@ import { useRoomStore } from '../roomStore'
 
 // Mock Firebase
 vi.mock('@/firebase', () => ({
-  db: {}
+  db: {},
+  getDb: () => ({}),
+  isFirebaseConfigured: true
 }))
 
 vi.mock('firebase/firestore', () => ({

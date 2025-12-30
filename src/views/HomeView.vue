@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRoomStore } from '@/stores/roomStore'
 import Button from 'primevue/button'
@@ -12,6 +12,8 @@ const joinRoomId = ref('')
 const joinError = ref('')
 const isCreating = ref(false)
 const isJoining = ref(false)
+
+const isConfigured = computed(() => roomStore.isConfigured)
 
 async function createRoom() {
   try {
@@ -63,6 +65,18 @@ async function joinRoom() {
       <p class="hero-subtitle">
         Your personal song queue for karaoke nights, open mics, and jam sessions
       </p>
+    </div>
+
+    <!-- Firebase Configuration Warning -->
+    <div
+      v-if="!isConfigured"
+      class="config-warning"
+    >
+      <i class="pi pi-exclamation-triangle" />
+      <div class="warning-content">
+        <strong>Firebase Not Configured</strong>
+        <p>Set up Firebase environment variables to enable room creation and real-time sync.</p>
+      </div>
     </div>
 
     <div class="actions">
@@ -126,6 +140,38 @@ async function joinRoom() {
 <style scoped>
 .home-view {
   padding-bottom: 2rem;
+}
+
+.config-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--warning-light);
+  border: 1px solid var(--warning-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.config-warning i {
+  font-size: 1.25rem;
+  color: var(--warning-color);
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.warning-content strong {
+  display: block;
+  color: var(--warning-color);
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.warning-content p {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
 }
 
 .hero {

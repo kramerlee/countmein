@@ -11,7 +11,7 @@ import {
   Timestamp,
   type Unsubscribe
 } from 'firebase/firestore'
-import { db } from '@/firebase'
+import { getDb, isFirebaseConfigured } from '@/firebase'
 import type { Room, SongRequest, Notification } from '@/types'
 
 function generateRoomId(): string {
@@ -58,6 +58,9 @@ export const useRoomStore = defineStore('room', () => {
 
   let unsubscribe: Unsubscribe | null = null
 
+  // Check if Firebase is configured
+  const isConfigured = computed(() => isFirebaseConfigured)
+
   const queue = computed(() => currentRoom.value?.queue ?? [])
 
   const pendingRequests = computed(() =>
@@ -91,7 +94,7 @@ export const useRoomStore = defineStore('room', () => {
       isLoading.value = true
       error.value = null
 
-      await setDoc(doc(db, 'rooms', roomId), {
+      await setDoc(doc(getDb(), 'rooms', roomId), {
         ...room,
         createdAt: Timestamp.fromDate(room.createdAt)
       })
@@ -121,7 +124,7 @@ export const useRoomStore = defineStore('room', () => {
       error.value = null
 
       // Check if room exists first
-      const roomDoc = await getDoc(doc(db, 'rooms', roomId))
+      const roomDoc = await getDoc(doc(getDb(), 'rooms', roomId))
       if (!roomDoc.exists()) {
         error.value = 'Room not found'
         return false
@@ -137,7 +140,7 @@ export const useRoomStore = defineStore('room', () => {
       const previousQueueLength = currentRoom.value?.queue.length ?? 0
 
       unsubscribe = onSnapshot(
-        doc(db, 'rooms', roomId),
+        doc(getDb(), 'rooms', roomId),
         (snapshot) => {
           if (snapshot.exists()) {
             const data = convertTimestamps(snapshot.data() as Record<string, unknown>) as unknown as Room
@@ -181,7 +184,7 @@ export const useRoomStore = defineStore('room', () => {
 
   async function roomExists(roomId: string): Promise<boolean> {
     try {
-      const roomDoc = await getDoc(doc(db, 'rooms', roomId))
+      const roomDoc = await getDoc(doc(getDb(), 'rooms', roomId))
       return roomDoc.exists()
     } catch (err) {
       console.error('Error checking room:', err)
@@ -208,7 +211,7 @@ export const useRoomStore = defineStore('room', () => {
       isLoading.value = true
       error.value = null
 
-      const roomRef = doc(db, 'rooms', roomId)
+      const roomRef = doc(getDb(), 'rooms', roomId)
 
       // Convert Date to Timestamp for Firestore
       const firestoreRequest = {
@@ -238,7 +241,7 @@ export const useRoomStore = defineStore('room', () => {
     if (!currentRoom.value) return
 
     try {
-      const roomRef = doc(db, 'rooms', roomId)
+      const roomRef = doc(getDb(), 'rooms', roomId)
       const updatedQueue = currentRoom.value.queue.map(r => {
         // If setting to 'next', clear any existing 'next' status
         if (status === 'next' && r.status === 'next' && r.id !== requestId) {
@@ -274,7 +277,7 @@ export const useRoomStore = defineStore('room', () => {
     if (!currentRoom.value) return
 
     try {
-      const roomRef = doc(db, 'rooms', roomId)
+      const roomRef = doc(getDb(), 'rooms', roomId)
       const requestToRemove = currentRoom.value.queue.find(r => r.id === requestId)
 
       if (requestToRemove) {
@@ -337,6 +340,7 @@ export const useRoomStore = defineStore('room', () => {
     currentHostId,
     isLoading,
     error,
+    isConfigured,
     queue,
     pendingRequests,
     nextRequest,

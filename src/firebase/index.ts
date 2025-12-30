@@ -1,5 +1,5 @@
-import { initializeApp } from 'firebase/app'
-import { getFirestore } from 'firebase/firestore'
+import { initializeApp, type FirebaseApp } from 'firebase/app'
+import { getFirestore, type Firestore } from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -10,6 +10,32 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 }
 
-const app = initializeApp(firebaseConfig)
-export const db = getFirestore(app)
+// Check if Firebase is configured
+export const isFirebaseConfigured = Boolean(
+  firebaseConfig.apiKey &&
+  firebaseConfig.projectId &&
+  firebaseConfig.appId
+)
 
+let app: FirebaseApp | null = null
+let db: Firestore | null = null
+
+// Lazy initialization to prevent crashes on load
+export function getDb(): Firestore {
+  if (!isFirebaseConfigured) {
+    throw new Error('Firebase is not configured. Please set environment variables.')
+  }
+
+  if (!app) {
+    app = initializeApp(firebaseConfig)
+  }
+
+  if (!db) {
+    db = getFirestore(app)
+  }
+
+  return db
+}
+
+// For backwards compatibility, but will throw if not configured
+export { db }

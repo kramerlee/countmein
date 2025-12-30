@@ -202,9 +202,13 @@ export const useRoomStore = defineStore('room', () => {
       id: generateRequestId(),
       guestName,
       songName,
-      youtubeLink: youtubeLink || undefined,
       status: 'pending',
       submittedAt: new Date()
+    }
+
+    // Only add youtubeLink if it has a value (Firebase doesn't accept undefined)
+    if (youtubeLink) {
+      request.youtubeLink = youtubeLink
     }
 
     try {
@@ -214,9 +218,17 @@ export const useRoomStore = defineStore('room', () => {
       const roomRef = doc(getDb(), 'rooms', roomId)
 
       // Convert Date to Timestamp for Firestore
-      const firestoreRequest = {
-        ...request,
+      // Also filter out any undefined values to be safe
+      const firestoreRequest: Record<string, unknown> = {
+        id: request.id,
+        guestName: request.guestName,
+        songName: request.songName,
+        status: request.status,
         submittedAt: Timestamp.fromDate(request.submittedAt)
+      }
+
+      if (request.youtubeLink) {
+        firestoreRequest.youtubeLink = request.youtubeLink
       }
 
       await updateDoc(roomRef, {
@@ -231,6 +243,23 @@ export const useRoomStore = defineStore('room', () => {
     } finally {
       isLoading.value = false
     }
+  }
+
+  // Helper to convert SongRequest to Firestore-safe object (no undefined values)
+  function toFirestoreRequest(r: SongRequest): Record<string, unknown> {
+    const result: Record<string, unknown> = {
+      id: r.id,
+      guestName: r.guestName,
+      songName: r.songName,
+      status: r.status,
+      submittedAt: r.submittedAt instanceof Date
+        ? Timestamp.fromDate(r.submittedAt)
+        : r.submittedAt
+    }
+    if (r.youtubeLink) {
+      result.youtubeLink = r.youtubeLink
+    }
+    return result
   }
 
   async function updateRequestStatus(
@@ -258,13 +287,8 @@ export const useRoomStore = defineStore('room', () => {
         return r
       })
 
-      // Convert dates to Timestamps
-      const firestoreQueue = updatedQueue.map(r => ({
-        ...r,
-        submittedAt: r.submittedAt instanceof Date
-          ? Timestamp.fromDate(r.submittedAt)
-          : r.submittedAt
-      }))
+      // Convert to Firestore-safe format (no undefined values)
+      const firestoreQueue = updatedQueue.map(toFirestoreRequest)
 
       await updateDoc(roomRef, { queue: firestoreQueue })
     } catch (err) {
@@ -281,12 +305,19 @@ export const useRoomStore = defineStore('room', () => {
       const requestToRemove = currentRoom.value.queue.find(r => r.id === requestId)
 
       if (requestToRemove) {
-        // Convert to Firestore format for removal
-        const firestoreRequest = {
-          ...requestToRemove,
+        // Convert to Firestore format for removal (exclude undefined values)
+        const firestoreRequest: Record<string, unknown> = {
+          id: requestToRemove.id,
+          guestName: requestToRemove.guestName,
+          songName: requestToRemove.songName,
+          status: requestToRemove.status,
           submittedAt: requestToRemove.submittedAt instanceof Date
             ? Timestamp.fromDate(requestToRemove.submittedAt)
             : requestToRemove.submittedAt
+        }
+
+        if (requestToRemove.youtubeLink) {
+          firestoreRequest.youtubeLink = requestToRemove.youtubeLink
         }
 
         await updateDoc(roomRef, {

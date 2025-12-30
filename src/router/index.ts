@@ -32,9 +32,9 @@ const routes: RouteRecordRaw[] = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  // Use BASE_URL from Vite config (set via VITE_BASE_URL env var)
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
 
 export default router
-

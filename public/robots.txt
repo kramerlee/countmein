@@ -1,0 +1,14 @@
+# Robots.txt for Count Me In
+# https://kramerlee.github.io/countmein/
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://kramerlee.github.io/countmein/sitemap.xml
+
+# Disallow dynamic room pages from indexing (they're temporary)
+Disallow: /room/
+Disallow: /join/
+Disallow: /guest/
+

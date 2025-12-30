@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Toast from 'primevue/toast'
+import { setLocale, type Locale } from './i18n'
+
+const { t, locale } = useI18n()
 
 const isDarkMode = ref(false)
 
 function toggleDarkMode() {
   isDarkMode.value = !isDarkMode.value
   document.documentElement.classList.toggle('dark-mode', isDarkMode.value)
+}
+
+function toggleLocale() {
+  const newLocale: Locale = locale.value === 'vi' ? 'en' : 'vi'
+  setLocale(newLocale)
 }
 </script>
 
@@ -21,14 +30,22 @@ function toggleDarkMode() {
         class="logo"
       >
         <i class="pi pi-microphone" />
-        <span>Count Me In</span>
+        <span>{{ t('app.name') }}</span>
       </router-link>
-      <button
-        class="theme-toggle"
-        @click="toggleDarkMode"
-      >
-        <i :class="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'" />
-      </button>
+      <div class="header-actions">
+        <button
+          class="locale-toggle"
+          @click="toggleLocale"
+        >
+          {{ locale === 'vi' ? 'EN' : 'VI' }}
+        </button>
+        <button
+          class="theme-toggle"
+          @click="toggleDarkMode"
+        >
+          <i :class="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'" />
+        </button>
+      </div>
     </header>
 
     <main class="app-main">
@@ -80,6 +97,31 @@ function toggleDarkMode() {
 .logo i {
   font-size: 1.5rem;
   color: var(--accent-color);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.locale-toggle {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+}
+
+.locale-toggle:hover {
+  background: var(--accent-light);
+  color: var(--accent-color);
+  border-color: var(--accent-color);
 }
 
 .theme-toggle {

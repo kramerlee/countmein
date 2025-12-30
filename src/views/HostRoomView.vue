@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useRoomStore } from '@/stores/roomStore'
 import { useToast } from 'primevue/usetoast'
 import QRCode from 'qrcode'
@@ -12,6 +13,7 @@ const props = defineProps<{
   roomId: string
 }>()
 
+const { t } = useI18n()
 const router = useRouter()
 const roomStore = useRoomStore()
 const toast = useToast()
@@ -47,8 +49,8 @@ onMounted(async () => {
   if (!success) {
     toast.add({
       severity: 'error',
-      summary: 'Room not found',
-      detail: 'This room does not exist',
+      summary: t('host.roomNotFound'),
+      detail: t('host.roomNotExist'),
       life: 3000
     })
     router.push({ name: 'Home' })
@@ -71,8 +73,8 @@ watch(
       if (latestRequest) {
         toast.add({
           severity: 'info',
-          summary: 'New Request!',
-          detail: `${latestRequest.guestName} wants to sing "${latestRequest.songName}"`,
+          summary: t('host.newRequest'),
+          detail: `${latestRequest.guestName} ${t('host.wantsToSing')} "${latestRequest.songName}"`,
           life: 5000
         })
       }
@@ -99,8 +101,8 @@ function copyRoomCode() {
   navigator.clipboard.writeText(props.roomId)
   toast.add({
     severity: 'success',
-    summary: 'Copied!',
-    detail: 'Room code copied to clipboard',
+    summary: t('common.copied'),
+    detail: t('host.codeCopied'),
     life: 2000
   })
 }
@@ -109,8 +111,8 @@ function copyJoinLink() {
   navigator.clipboard.writeText(joinUrl.value)
   toast.add({
     severity: 'success',
-    summary: 'Copied!',
-    detail: 'Join link copied to clipboard',
+    summary: t('common.copied'),
+    detail: t('host.linkCopied'),
     life: 2000
   })
 }
@@ -118,8 +120,8 @@ function copyJoinLink() {
 function shareRoom() {
   if (navigator.share) {
     navigator.share({
-      title: 'Join my Count Me In room!',
-      text: `Join room ${props.roomId} to add your song to the queue`,
+      title: t('app.name'),
+      text: `${t('common.room')} ${props.roomId}`,
       url: joinUrl.value
     })
   } else {
@@ -144,14 +146,14 @@ function removeRequest(requestId: string) {
       class="loading-state"
     >
       <i class="pi pi-spin pi-spinner" />
-      <p>Connecting to room...</p>
+      <p>{{ t('host.connecting') }}</p>
     </div>
 
     <template v-else>
       <!-- Room Header -->
       <div class="room-header">
         <div class="room-info">
-          <span class="room-label">Room Code</span>
+          <span class="room-label">{{ t('common.roomCode') }}</span>
           <div class="room-code-wrapper">
             <span class="room-code">{{ roomId }}</span>
             <button
@@ -165,13 +167,13 @@ function removeRequest(requestId: string) {
 
         <div class="room-actions">
           <Button
-            v-tooltip.bottom="'Show QR Code'"
+            v-tooltip.bottom="t('host.scanToJoin')"
             icon="pi pi-qrcode"
             class="action-btn"
             @click="showQrModal = true"
           />
           <Button
-            v-tooltip.bottom="'Share Room'"
+            v-tooltip.bottom="t('common.share')"
             icon="pi pi-share-alt"
             class="action-btn"
             @click="shareRoom"
@@ -196,7 +198,7 @@ function removeRequest(requestId: string) {
             >
               <i class="pi pi-times" />
             </button>
-            <h2>Scan to Join</h2>
+            <h2>{{ t('host.scanToJoin') }}</h2>
             <div class="qr-code-container">
               <img
                 :src="qrCodeDataUrl"
@@ -208,7 +210,7 @@ function removeRequest(requestId: string) {
               {{ roomId }}
             </p>
             <Button
-              label="Copy Link"
+              :label="t('host.copyLink')"
               icon="pi pi-link"
               class="copy-link-btn"
               @click="copyJoinLink"
@@ -221,11 +223,11 @@ function removeRequest(requestId: string) {
       <div class="queue-stats">
         <div class="stat">
           <span class="stat-value">{{ activeQueue.length }}</span>
-          <span class="stat-label">In Queue</span>
+          <span class="stat-label">{{ t('host.inQueue') }}</span>
         </div>
         <div class="stat">
           <span class="stat-value">{{ completedRequests.length }}</span>
-          <span class="stat-label">Completed</span>
+          <span class="stat-label">{{ t('host.completed') }}</span>
         </div>
       </div>
 
@@ -237,7 +239,7 @@ function removeRequest(requestId: string) {
           @click="activeTab = 'queue'"
         >
           <i class="pi pi-list" />
-          Queue
+          {{ t('host.queue') }}
         </button>
         <button
           class="tab"
@@ -245,7 +247,7 @@ function removeRequest(requestId: string) {
           @click="activeTab = 'completed'"
         >
           <i class="pi pi-check-circle" />
-          Completed
+          {{ t('host.completed') }}
         </button>
       </div>
 
@@ -261,8 +263,8 @@ function removeRequest(requestId: string) {
           <div class="empty-icon">
             <i class="pi pi-inbox" />
           </div>
-          <h3>No requests yet</h3>
-          <p>Share your QR code to let guests add songs</p>
+          <h3>{{ t('host.noRequests') }}</h3>
+          <p>{{ t('host.shareQrCode') }}</p>
         </div>
 
         <TransitionGroup
@@ -293,8 +295,8 @@ function removeRequest(requestId: string) {
           <div class="empty-icon">
             <i class="pi pi-check-circle" />
           </div>
-          <h3>No completed songs</h3>
-          <p>Completed requests will appear here</p>
+          <h3>{{ t('host.noCompleted') }}</h3>
+          <p>{{ t('host.completedHere') }}</p>
         </div>
 
         <TransitionGroup

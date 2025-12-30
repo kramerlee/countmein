@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useRoomStore } from '@/stores/roomStore'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 
+const { t } = useI18n()
 const router = useRouter()
 const roomStore = useRoomStore()
 
@@ -21,7 +23,7 @@ async function createRoom() {
     const room = await roomStore.createRoom()
     router.push({ name: 'HostRoom', params: { roomId: room.id } })
   } catch {
-    joinError.value = 'Failed to create room. Please try again.'
+    joinError.value = t('home.failedCreate')
   } finally {
     isCreating.value = false
   }
@@ -31,7 +33,7 @@ async function joinRoom() {
   const roomId = joinRoomId.value.trim().toUpperCase()
 
   if (!roomId) {
-    joinError.value = 'Please enter a room code'
+    joinError.value = t('home.enterCode')
     return
   }
 
@@ -40,13 +42,13 @@ async function joinRoom() {
     const exists = await roomStore.roomExists(roomId)
 
     if (!exists) {
-      joinError.value = 'Room not found. Check the code and try again.'
+      joinError.value = t('home.roomNotFound')
       return
     }
 
     router.push({ name: 'JoinRoom', params: { roomId } })
   } catch {
-    joinError.value = 'Failed to check room. Please try again.'
+    joinError.value = t('home.failedCheck')
   } finally {
     isJoining.value = false
   }
@@ -60,10 +62,10 @@ async function joinRoom() {
         <i class="pi pi-microphone" />
       </div>
       <h1 class="hero-title">
-        Count Me In
+        {{ t('app.name') }}
       </h1>
       <p class="hero-subtitle">
-        Your personal song queue for karaoke nights, open mics, and jam sessions
+        {{ t('app.tagline') }}
       </p>
     </div>
 
@@ -74,8 +76,8 @@ async function joinRoom() {
     >
       <i class="pi pi-exclamation-triangle" />
       <div class="warning-content">
-        <strong>Firebase Not Configured</strong>
-        <p>Set up Firebase environment variables to enable room creation and real-time sync.</p>
+        <strong>{{ t('config.notConfigured') }}</strong>
+        <p>{{ t('config.setupMessage') }}</p>
       </div>
     </div>
 
@@ -84,10 +86,10 @@ async function joinRoom() {
         <div class="action-icon">
           <i class="pi pi-star" />
         </div>
-        <h2>Host a Room</h2>
-        <p>Create a room and share your QR code with guests</p>
+        <h2>{{ t('home.hostTitle') }}</h2>
+        <p>{{ t('home.hostDesc') }}</p>
         <Button
-          label="Create Room"
+          :label="t('home.createRoom')"
           icon="pi pi-plus"
           class="btn-action"
           :loading="isCreating"
@@ -97,27 +99,27 @@ async function joinRoom() {
       </div>
 
       <div class="divider">
-        <span>or</span>
+        <span>{{ t('common.or') }}</span>
       </div>
 
       <div class="action-card join-card">
         <div class="action-icon">
           <i class="pi pi-users" />
         </div>
-        <h2>Join a Room</h2>
-        <p>Enter the room code to submit your song request</p>
+        <h2>{{ t('home.joinTitle') }}</h2>
+        <p>{{ t('home.joinDesc') }}</p>
 
         <div class="join-form">
           <InputText
             v-model="joinRoomId"
-            placeholder="Enter room code"
+            :placeholder="t('home.enterRoomCode')"
             class="room-code-input"
             :disabled="isJoining"
             @keyup.enter="joinRoom"
             @input="joinError = ''"
           />
           <Button
-            label="Join"
+            :label="t('home.join')"
             icon="pi pi-sign-in"
             class="btn-join"
             :loading="isJoining"

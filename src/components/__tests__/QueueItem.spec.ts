@@ -1,9 +1,31 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { createI18n } from 'vue-i18n'
 import QueueItem from '../QueueItem.vue'
 import PrimeVue from 'primevue/config'
 import Button from 'primevue/button'
 import type { SongRequest } from '@/types'
+
+// Create i18n instance for tests
+const i18n = createI18n({
+  legacy: false,
+  locale: 'en',
+  messages: {
+    en: {
+      queue: {
+        pending: 'Pending',
+        next: 'Next',
+        ongoing: 'Ongoing',
+        completed: 'Completed',
+        upNext: 'Up Next',
+        nowSinging: 'Now Singing',
+        start: 'Start',
+        startSinging: 'Start Singing',
+        complete: 'Complete'
+      }
+    }
+  }
+})
 
 const createRequest = (overrides: Partial<SongRequest> = {}): SongRequest => ({
   id: 'req_123',
@@ -18,7 +40,7 @@ const mountComponent = (props: { request: SongRequest; position?: number; readon
   return mount(QueueItem, {
     props,
     global: {
-      plugins: [[PrimeVue, {}]],
+      plugins: [[PrimeVue, {}], i18n],
       components: { Button }
     }
   })

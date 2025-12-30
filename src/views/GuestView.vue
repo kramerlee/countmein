@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useRoomStore } from '@/stores/roomStore'
 import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
@@ -10,6 +11,7 @@ const props = defineProps<{
   roomId: string
 }>()
 
+const { t } = useI18n()
 const router = useRouter()
 const roomStore = useRoomStore()
 const toast = useToast()
@@ -28,8 +30,8 @@ onMounted(async () => {
   if (!exists) {
     toast.add({
       severity: 'error',
-      summary: 'Room not found',
-      detail: 'This room does not exist or has been closed',
+      summary: t('host.roomNotFound'),
+      detail: t('guest.roomClosed'),
       life: 3000
     })
     router.push({ name: 'Home' })
@@ -49,17 +51,17 @@ function validateForm(): boolean {
   errors.value = {}
 
   if (!guestName.value.trim()) {
-    errors.value.guestName = 'Please enter your name'
+    errors.value.guestName = t('guest.nameRequired')
   }
 
   if (!songName.value.trim()) {
-    errors.value.songName = 'Please enter a song name'
+    errors.value.songName = t('guest.songRequired')
   }
 
   if (youtubeLink.value.trim()) {
     const ytRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/
     if (!ytRegex.test(youtubeLink.value.trim())) {
-      errors.value.youtubeLink = 'Please enter a valid YouTube URL'
+      errors.value.youtubeLink = t('guest.invalidYoutube')
     }
   }
 
@@ -89,8 +91,8 @@ async function submitRequest() {
   } else {
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to submit request. Please try again.',
+      summary: t('common.error'),
+      detail: t('guest.submitFailed'),
       life: 3000
     })
     isSubmitting.value = false
@@ -106,17 +108,17 @@ async function submitRequest() {
       class="loading-state"
     >
       <i class="pi pi-spin pi-spinner" />
-      <p>Checking room...</p>
+      <p>{{ t('guest.checkingRoom') }}</p>
     </div>
 
     <template v-else>
       <div class="guest-header">
         <div class="room-badge">
           <i class="pi pi-users" />
-          <span>Room {{ roomId }}</span>
+          <span>{{ t('common.room') }} {{ roomId }}</span>
         </div>
-        <h1>Add Your Song</h1>
-        <p>Fill in the details below to join the queue</p>
+        <h1>{{ t('guest.addSong') }}</h1>
+        <p>{{ t('guest.fillDetails') }}</p>
       </div>
 
       <form
@@ -128,12 +130,12 @@ async function submitRequest() {
             class="form-label"
             for="guestName"
           >
-            Your Name <span class="required">*</span>
+            {{ t('guest.yourName') }} <span class="required">{{ t('guest.required') }}</span>
           </label>
           <InputText
             id="guestName"
             v-model="guestName"
-            placeholder="Enter your name"
+            :placeholder="t('guest.enterName')"
             class="form-input"
             :class="{ 'p-invalid': errors.guestName }"
           />
@@ -148,12 +150,12 @@ async function submitRequest() {
             class="form-label"
             for="songName"
           >
-            Song Name <span class="required">*</span>
+            {{ t('guest.songName') }} <span class="required">{{ t('guest.required') }}</span>
           </label>
           <InputText
             id="songName"
             v-model="songName"
-            placeholder="What song do you want to sing?"
+            :placeholder="t('guest.whatSong')"
             class="form-input"
             :class="{ 'p-invalid': errors.songName }"
           />
@@ -168,12 +170,12 @@ async function submitRequest() {
             class="form-label"
             for="youtubeLink"
           >
-            YouTube Link <span class="optional">(optional)</span>
+            {{ t('guest.youtubeLink') }} <span class="optional">{{ t('guest.optional') }}</span>
           </label>
           <InputText
             id="youtubeLink"
             v-model="youtubeLink"
-            placeholder="https://youtube.com/watch?v=..."
+            :placeholder="t('guest.youtubePlaceholder')"
             class="form-input"
             :class="{ 'p-invalid': errors.youtubeLink }"
           />
@@ -186,13 +188,13 @@ async function submitRequest() {
             class="helper-text"
           >
             <i class="pi pi-info-circle" />
-            Add a YouTube link to help the host find your song
+            {{ t('guest.youtubeHelper') }}
           </small>
         </div>
 
         <Button
           type="submit"
-          label="Submit Request"
+          :label="t('guest.submit')"
           icon="pi pi-send"
           class="submit-btn"
           :loading="isSubmitting"

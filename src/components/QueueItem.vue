@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 import type { SongRequest } from '@/types'
 
@@ -14,12 +15,14 @@ const emit = defineEmits<{
   (e: 'remove'): void
 }>()
 
+const { t } = useI18n()
+
 const statusLabel = computed(() => {
   switch (props.request.status) {
-    case 'next': return 'Up Next'
-    case 'ongoing': return 'Now Singing'
-    case 'completed': return 'Completed'
-    default: return 'Pending'
+    case 'next': return t('queue.upNext')
+    case 'ongoing': return t('queue.nowSinging')
+    case 'completed': return t('queue.completed')
+    default: return t('queue.pending')
   }
 })
 
@@ -61,7 +64,7 @@ function openYoutubeLink() {
           }"
         />
       </div>
-      
+
       <div class="item-content">
         <div class="song-name">
           {{ request.songName }}
@@ -71,7 +74,7 @@ function openYoutubeLink() {
           <span>{{ request.guestName }}</span>
         </div>
       </div>
-      
+
       <span
         class="status-badge"
         :class="`badge-${request.status}`"
@@ -101,41 +104,41 @@ function openYoutubeLink() {
     >
       <template v-if="request.status === 'pending'">
         <Button
-          label="Next"
+          :label="t('queue.next')"
           icon="pi pi-forward"
           size="small"
           class="action-btn next"
           @click="emit('update-status', 'next')"
         />
         <Button
-          label="Start"
+          :label="t('queue.start')"
           icon="pi pi-play"
           size="small"
           class="action-btn start"
           @click="emit('update-status', 'ongoing')"
         />
       </template>
-      
+
       <template v-else-if="request.status === 'next'">
         <Button
-          label="Start Singing"
+          :label="t('queue.startSinging')"
           icon="pi pi-play"
           size="small"
           class="action-btn start wide"
           @click="emit('update-status', 'ongoing')"
         />
       </template>
-      
+
       <template v-else-if="request.status === 'ongoing'">
         <Button
-          label="Complete"
+          :label="t('queue.complete')"
           icon="pi pi-check"
           size="small"
           class="action-btn complete wide"
           @click="emit('update-status', 'completed')"
         />
       </template>
-      
+
       <Button
         icon="pi pi-trash"
         size="small"
@@ -390,4 +393,3 @@ function openYoutubeLink() {
   }
 }
 </style>
-

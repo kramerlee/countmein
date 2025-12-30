@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Button from 'primevue/button'
 
 const props = defineProps<{
   roomId: string
 }>()
 
+const { t } = useI18n()
 const router = useRouter()
 
 function addAnotherSong() {
@@ -23,24 +25,24 @@ function goHome() {
       <div class="success-icon">
         <i class="pi pi-check" />
       </div>
-      
-      <h1>You're in the Queue!</h1>
-      <p>Your song request has been submitted. The host will see it shortly.</p>
-      
+
+      <h1>{{ t('submitted.inQueue') }}</h1>
+      <p>{{ t('submitted.requestSent') }}</p>
+
       <div class="room-info">
-        <span class="room-label">Room</span>
+        <span class="room-label">{{ t('common.room') }}</span>
         <span class="room-code">{{ roomId }}</span>
       </div>
 
       <div class="actions">
         <Button
-          label="Add Another Song"
+          :label="t('submitted.addAnother')"
           icon="pi pi-plus"
           class="btn-primary-action"
           @click="addAnotherSong"
         />
         <Button
-          label="Done"
+          :label="t('submitted.done')"
           icon="pi pi-home"
           class="btn-secondary-action"
           outlined
@@ -52,12 +54,12 @@ function goHome() {
     <div class="tips">
       <h3>
         <i class="pi pi-lightbulb" />
-        Tips
+        {{ t('submitted.tips') }}
       </h3>
       <ul>
-        <li>Stay close to hear when it's your turn</li>
-        <li>Check with the host if you need to step away</li>
-        <li>Have fun and enjoy the show!</li>
+        <li>{{ t('submitted.tip1') }}</li>
+        <li>{{ t('submitted.tip2') }}</li>
+        <li>{{ t('submitted.tip3') }}</li>
       </ul>
     </div>
   </div>
@@ -210,4 +212,3 @@ function goHome() {
   }
 }
 </style>
-

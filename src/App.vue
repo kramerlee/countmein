@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Toast from 'primevue/toast'
 import { setLocale, type Locale } from './i18n'
+import { trackLanguageSwitch, trackThemeToggle } from '@/utils/analytics'
 
 const { t, locale } = useI18n()
 
@@ -11,11 +12,13 @@ const isDarkMode = ref(false)
 function toggleDarkMode() {
   isDarkMode.value = !isDarkMode.value
   document.documentElement.classList.toggle('dark-mode', isDarkMode.value)
+  trackThemeToggle(isDarkMode.value ? 'dark' : 'light')
 }
 
 function toggleLocale() {
   const newLocale: Locale = locale.value === 'vi' ? 'en' : 'vi'
   setLocale(newLocale)
+  trackLanguageSwitch(newLocale)
 }
 </script>
 

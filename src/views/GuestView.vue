@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useRoomStore } from '@/stores/roomStore'
 import { useToast } from 'primevue/usetoast'
+import { trackSongSubmit } from '@/utils/analytics'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 
@@ -81,6 +82,9 @@ async function submitRequest() {
   )
 
   if (request) {
+    // Track song submission
+    trackSongSubmit(props.roomId)
+
     // Store guest name for future submissions
     localStorage.setItem('countmein_guest_name', guestName.value.trim())
 

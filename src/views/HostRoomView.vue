@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useRoomStore } from '@/stores/roomStore'
 import { useToast } from 'primevue/usetoast'
+import { trackQRCode, trackLinkCopy } from '@/utils/analytics'
 import QRCode from 'qrcode'
 import Button from 'primevue/button'
 import QueueItem from '@/components/QueueItem.vue'
@@ -108,6 +109,7 @@ function copyRoomCode() {
 }
 
 function copyJoinLink() {
+  trackLinkCopy(props.roomId)
   navigator.clipboard.writeText(joinUrl.value)
   toast.add({
     severity: 'success',
@@ -115,6 +117,11 @@ function copyJoinLink() {
     detail: t('host.linkCopied'),
     life: 2000
   })
+}
+
+function openQrModal() {
+  trackQRCode('view', props.roomId)
+  showQrModal.value = true
 }
 
 function shareRoom() {
@@ -170,7 +177,7 @@ function removeRequest(requestId: string) {
             v-tooltip.bottom="t('host.scanToJoin')"
             icon="pi pi-qrcode"
             class="action-btn"
-            @click="showQrModal = true"
+            @click="openQrModal"
           />
           <Button
             v-tooltip.bottom="t('common.share')"

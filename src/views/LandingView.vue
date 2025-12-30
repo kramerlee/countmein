@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useRoomStore } from '@/stores/roomStore'
+import {
+  trackLandingView,
+  trackLandingCTA,
+  trackSectionView,
+  trackRoomCreate,
+  trackRoomJoin
+} from '@/utils/analytics'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 
@@ -17,10 +24,53 @@ const isJoining = ref(false)
 
 const isConfigured = computed(() => roomStore.isConfigured)
 
+// Track section visibility
+const trackedSections = new Set<string>()
+let observer: IntersectionObserver | null = null
+
+onMounted(() => {
+  // Track landing page view
+  trackLandingView()
+
+  // Set up intersection observer for section tracking
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const sectionId = entry.target.id
+          if (sectionId && !trackedSections.has(sectionId)) {
+            trackedSections.add(sectionId)
+            const sectionMap: Record<string, 'features' | 'how_it_works' | 'get_started'> = {
+              'features': 'features',
+              'how-it-works': 'how_it_works',
+              'get-started': 'get_started'
+            }
+            if (sectionMap[sectionId]) {
+              trackSectionView(sectionMap[sectionId])
+            }
+          }
+        }
+      })
+    },
+    { threshold: 0.3 }
+  )
+
+  // Observe sections
+  document.querySelectorAll('section[id]').forEach((section) => {
+    observer?.observe(section)
+  })
+})
+
+onUnmounted(() => {
+  observer?.disconnect()
+})
+
 async function createRoom() {
+  trackRoomCreate(false) // Track attempt
   try {
     isCreating.value = true
     const room = await roomStore.createRoom()
+    trackRoomCreate(true, room.id) // Track success
     router.push({ name: 'HostRoom', params: { roomId: room.id } })
   } catch {
     joinError.value = t('home.failedCreate')
@@ -37,6 +87,7 @@ async function joinRoom() {
     return
   }
 
+  trackRoomJoin(false) // Track attempt
   try {
     isJoining.value = true
     const exists = await roomStore.roomExists(roomId)
@@ -46,6 +97,7 @@ async function joinRoom() {
       return
     }
 
+    trackRoomJoin(true, roomId) // Track success
     router.push({ name: 'JoinRoom', params: { roomId } })
   } catch {
     joinError.value = t('home.failedCheck')
@@ -55,7 +107,13 @@ async function joinRoom() {
 }
 
 function scrollToActions() {
+  trackLandingCTA('get_started')
   document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' })
+}
+
+function handleLearnMore() {
+  trackLandingCTA('learn_more')
+  document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })
 }
 </script>
 
@@ -96,7 +154,7 @@ function scrollToActions() {
             icon="pi pi-play"
             class="btn-secondary-hero"
             outlined
-            @click="scrollToActions"
+            @click="handleLearnMore"
           />
         </div>
         
@@ -124,7 +182,10 @@ function scrollToActions() {
     </section>
 
     <!-- Features Section -->
-    <section class="features-section">
+    <section
+      id="features"
+      class="features-section"
+    >
       <div class="section-header">
         <h2>{{ t('landing.featuresTitle') }}</h2>
         <p>{{ t('landing.featuresSubtitle') }}</p>
@@ -166,7 +227,10 @@ function scrollToActions() {
     </section>
 
     <!-- How It Works Section -->
-    <section class="how-it-works-section">
+    <section
+      id="how-it-works"
+      class="how-it-works-section"
+    >
       <div class="section-header">
         <h2>{{ t('landing.howItWorksTitle') }}</h2>
         <p>{{ t('landing.howItWorksSubtitle') }}</p>

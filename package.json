@@ -11,7 +11,8 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint . --fix",
-    "type-check": "vue-tsc --noEmit"
+    "type-check": "vue-tsc --noEmit",
+    "sync-secrets": "./scripts/sync-secrets.sh"
   },
   "dependencies": {
     "@primevue/themes": "^4.5.4",

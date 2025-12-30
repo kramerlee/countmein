@@ -140,7 +140,7 @@ export const useRoomStore = defineStore('room', () => {
         doc(db, 'rooms', roomId),
         (snapshot) => {
           if (snapshot.exists()) {
-            const data = convertTimestamps(snapshot.data()) as Room
+            const data = convertTimestamps(snapshot.data() as Record<string, unknown>) as unknown as Room
             const newQueueLength = data.queue?.length ?? 0
 
             // Show notification if new request added (only for host)

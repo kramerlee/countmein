@@ -81,8 +81,9 @@ describe('roomStore', () => {
       store.addNotification('Test message', 'info')
 
       expect(store.notifications).toHaveLength(1)
-      expect(store.notifications[0].message).toBe('Test message')
-      expect(store.notifications[0].type).toBe('info')
+      const notification = store.notifications[0]
+      expect(notification?.message).toBe('Test message')
+      expect(notification?.type).toBe('info')
     })
 
     it('should auto-remove notification after 5 seconds', () => {
@@ -101,9 +102,10 @@ describe('roomStore', () => {
       const store = useRoomStore()
 
       store.addNotification('Test message', 'info')
-      const notificationId = store.notifications[0].id
+      const notification = store.notifications[0]
+      expect(notification).toBeDefined()
 
-      store.removeNotification(notificationId)
+      store.removeNotification(notification!.id)
 
       expect(store.notifications).toHaveLength(0)
     })

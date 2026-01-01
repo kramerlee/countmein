@@ -129,6 +129,44 @@ export default {
   config: {
     notConfigured: 'Firebase Chưa Cấu Hình',
     setupMessage: 'Thiết lập biến môi trường Firebase để kích hoạt tạo phòng và đồng bộ thời gian thực.'
+  },
+  auth: {
+    login: 'Đăng Nhập',
+    register: 'Đăng Ký',
+    logout: 'Đăng Xuất',
+    loginSubtitle: 'Chào mừng trở lại! Đăng nhập để quản lý phòng.',
+    registerSubtitle: 'Tạo tài khoản để bắt đầu làm host.',
+    email: 'Email',
+    emailPlaceholder: 'Nhập email của bạn',
+    password: 'Mật khẩu',
+    passwordPlaceholder: 'Nhập mật khẩu',
+    passwordHint: 'Ít nhất 6 ký tự',
+    confirmPassword: 'Xác nhận mật khẩu',
+    confirmPasswordPlaceholder: 'Nhập lại mật khẩu',
+    passwordsNoMatch: 'Mật khẩu không khớp',
+    displayName: 'Tên hiển thị',
+    displayNamePlaceholder: 'Bạn muốn được gọi là gì?',
+    createAccount: 'Tạo Tài Khoản',
+    noAccount: 'Chưa có tài khoản?',
+    haveAccount: 'Đã có tài khoản?'
+  },
+  dashboard: {
+    welcome: 'Chào mừng',
+    host: 'Host',
+    subtitle: 'Quản lý phòng karaoke của bạn từ đây.',
+    createRoom: 'Tạo Phòng',
+    totalRooms: 'Tổng Phòng',
+    activeRooms: 'Đang hoạt động',
+    totalRequests: 'Tổng Yêu Cầu',
+    yourRooms: 'Phòng Của Bạn',
+    noRooms: 'Chưa có phòng nào',
+    noRoomsDesc: 'Tạo phòng đầu tiên để bắt đầu.',
+    createFirstRoom: 'Tạo Phòng Đầu Tiên',
+    songs: 'bài hát',
+    active: 'Đang hát',
+    pending: 'chờ',
+    empty: 'Trống',
+    expired: 'Hết hạn'
   }
 }
 

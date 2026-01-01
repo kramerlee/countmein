@@ -10,6 +10,7 @@ export interface SongRequest {
 export interface Room {
   id: string
   hostId: string
+  ownerId?: string  // Firebase Auth user ID (if created by logged-in user)
   createdAt: Date
   expiresAt: Date  // TTL - room will be auto-deleted after this time
   queue: SongRequest[]

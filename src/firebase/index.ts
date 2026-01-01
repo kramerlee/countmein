@@ -1,5 +1,6 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app'
 import { getFirestore, type Firestore } from 'firebase/firestore'
+import { getAuth, type Auth } from 'firebase/auth'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -19,9 +20,10 @@ export const isFirebaseConfigured = Boolean(
 
 let app: FirebaseApp | null = null
 let db: Firestore | null = null
+let auth: Auth | null = null
 
-// Lazy initialization to prevent crashes on load
-export function getDb(): Firestore {
+// Get Firebase app instance (lazy initialization)
+export function getApp(): FirebaseApp {
   if (!isFirebaseConfigured) {
     throw new Error('Firebase is not configured. Please set environment variables.')
   }
@@ -30,12 +32,24 @@ export function getDb(): Firestore {
     app = initializeApp(firebaseConfig)
   }
 
-  if (!db) {
-    db = getFirestore(app)
-  }
+  return app
+}
 
+// Lazy initialization to prevent crashes on load
+export function getDb(): Firestore {
+  if (!db) {
+    db = getFirestore(getApp())
+  }
   return db
 }
 
-// For backwards compatibility, but will throw if not configured
-export { db }
+// Get Firebase Auth instance
+export function getFirebaseAuth(): Auth {
+  if (!auth) {
+    auth = getAuth(getApp())
+  }
+  return auth
+}
+
+// For backwards compatibility
+export { db, auth }

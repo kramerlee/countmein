@@ -9,6 +9,11 @@ import {
   arrayUnion,
   arrayRemove,
   Timestamp,
+  collection,
+  query,
+  where,
+  getDocs,
+  orderBy,
   type Unsubscribe
 } from 'firebase/firestore'
 import { getDb, isFirebaseConfigured } from '@/firebase'
@@ -52,12 +57,14 @@ function convertTimestamps(data: Record<string, unknown>): Record<string, unknow
 
 export const useRoomStore = defineStore('room', () => {
   const currentRoom = ref<Room | null>(null)
+  const userRooms = ref<Room[]>([])
   const notifications = ref<Notification[]>([])
   const currentHostId = ref<string | null>(null)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
   let unsubscribe: Unsubscribe | null = null
+  let userRoomsUnsubscribe: Unsubscribe | null = null
 
   // Check if Firebase is configured
   const isConfigured = computed(() => isFirebaseConfigured)
@@ -80,7 +87,7 @@ export const useRoomStore = defineStore('room', () => {
     queue.value.filter(r => r.status === 'completed')
   )
 
-  async function createRoom(): Promise<Room> {
+  async function createRoom(ownerId?: string): Promise<Room> {
     const roomId = generateRoomId()
     const hostId = generateHostId()
     const now = new Date()
@@ -94,15 +101,28 @@ export const useRoomStore = defineStore('room', () => {
       queue: []
     }
 
+    // Add ownerId if provided (authenticated user)
+    if (ownerId) {
+      room.ownerId = ownerId
+    }
+
     try {
       isLoading.value = true
       error.value = null
 
-      await setDoc(doc(getDb(), 'rooms', roomId), {
-        ...room,
+      const firestoreData: Record<string, unknown> = {
+        id: room.id,
+        hostId: room.hostId,
         createdAt: Timestamp.fromDate(room.createdAt),
-        expiresAt: Timestamp.fromDate(room.expiresAt)
-      })
+        expiresAt: Timestamp.fromDate(room.expiresAt),
+        queue: room.queue
+      }
+
+      if (ownerId) {
+        firestoreData.ownerId = ownerId
+      }
+
+      await setDoc(doc(getDb(), 'rooms', roomId), firestoreData)
 
       currentHostId.value = hostId
       localStorage.setItem(`countmein_host_${roomId}`, hostId)
@@ -414,8 +434,57 @@ export const useRoomStore = defineStore('room', () => {
     }
   }
 
+  // Get all rooms owned by a user
+  async function getUserRooms(userId: string): Promise<Room[]> {
+    try {
+      const roomsRef = collection(getDb(), 'rooms')
+      const q = query(
+        roomsRef,
+        where('ownerId', '==', userId),
+        orderBy('createdAt', 'desc')
+      )
+
+      const snapshot = await getDocs(q)
+      const rooms: Room[] = []
+
+      snapshot.forEach((doc) => {
+        const data = convertTimestamps(doc.data() as Record<string, unknown>) as unknown as Room
+        rooms.push(data)
+      })
+
+      userRooms.value = rooms
+      return rooms
+    } catch (err) {
+      console.error('Error fetching user rooms:', err)
+      return []
+    }
+  }
+
+  // Unsubscribe from user rooms listener
+  function unsubscribeFromUserRooms() {
+    if (userRoomsUnsubscribe) {
+      userRoomsUnsubscribe()
+      userRoomsUnsubscribe = null
+    }
+    userRooms.value = []
+  }
+
+  // Check if current user owns the room (by ownerId or hostId in localStorage)
+  function isRoomOwner(roomId: string, userId?: string): boolean {
+    if (!currentRoom.value) return false
+    
+    // Check by ownerId (authenticated user)
+    if (userId && currentRoom.value.ownerId === userId) {
+      return true
+    }
+    
+    // Fall back to hostId check (legacy/anonymous)
+    return isHost(roomId)
+  }
+
   return {
     currentRoom,
+    userRooms,
     notifications,
     currentHostId,
     isLoading,
@@ -436,7 +505,10 @@ export const useRoomStore = defineStore('room', () => {
     addNotification,
     removeNotification,
     unsubscribeFromRoom,
+    unsubscribeFromUserRooms,
     isHost,
-    extendRoomTTL
+    isRoomOwner,
+    extendRoomTTL,
+    getUserRooms
   }
 })

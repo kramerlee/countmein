@@ -129,6 +129,44 @@ export default {
   config: {
     notConfigured: 'Firebase Not Configured',
     setupMessage: 'Set up Firebase environment variables to enable room creation and real-time sync.'
+  },
+  auth: {
+    login: 'Sign In',
+    register: 'Sign Up',
+    logout: 'Sign Out',
+    loginSubtitle: 'Welcome back! Sign in to manage your rooms.',
+    registerSubtitle: 'Create an account to start hosting.',
+    email: 'Email',
+    emailPlaceholder: 'Enter your email',
+    password: 'Password',
+    passwordPlaceholder: 'Enter your password',
+    passwordHint: 'At least 6 characters',
+    confirmPassword: 'Confirm Password',
+    confirmPasswordPlaceholder: 'Re-enter your password',
+    passwordsNoMatch: 'Passwords do not match',
+    displayName: 'Display Name',
+    displayNamePlaceholder: 'How should we call you?',
+    createAccount: 'Create Account',
+    noAccount: "Don't have an account?",
+    haveAccount: 'Already have an account?'
+  },
+  dashboard: {
+    welcome: 'Welcome',
+    host: 'Host',
+    subtitle: 'Manage your karaoke rooms from here.',
+    createRoom: 'Create Room',
+    totalRooms: 'Total Rooms',
+    activeRooms: 'Active',
+    totalRequests: 'Total Requests',
+    yourRooms: 'Your Rooms',
+    noRooms: 'No rooms yet',
+    noRoomsDesc: 'Create your first room to get started.',
+    createFirstRoom: 'Create Your First Room',
+    songs: 'songs',
+    active: 'Active',
+    pending: 'pending',
+    empty: 'Empty',
+    expired: 'Expired'
   }
 }
 

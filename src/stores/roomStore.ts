@@ -13,7 +13,6 @@ import {
   query,
   where,
   getDocs,
-  orderBy,
   type Unsubscribe
 } from 'firebase/firestore'
 import { getDb, isFirebaseConfigured } from '@/firebase'
@@ -455,24 +454,35 @@ export const useRoomStore = defineStore('room', () => {
   async function getUserRooms(userId: string): Promise<Room[]> {
     try {
       const roomsRef = collection(getDb(), 'rooms')
+      // Simple query without orderBy to avoid requiring composite index
       const q = query(
         roomsRef,
-        where('ownerId', '==', userId),
-        orderBy('createdAt', 'desc')
+        where('ownerId', '==', userId)
       )
 
       const snapshot = await getDocs(q)
       const rooms: Room[] = []
 
-      snapshot.forEach((doc) => {
-        const data = convertTimestamps(doc.data() as Record<string, unknown>) as unknown as Room
+      snapshot.forEach((docSnap) => {
+        const data = convertTimestamps(docSnap.data() as Record<string, unknown>) as unknown as Room
         rooms.push(data)
+      })
+
+      // Sort client-side by createdAt descending (newest first)
+      rooms.sort((a, b) => {
+        const dateA = a.createdAt instanceof Date ? a.createdAt : new Date(a.createdAt)
+        const dateB = b.createdAt instanceof Date ? b.createdAt : new Date(b.createdAt)
+        return dateB.getTime() - dateA.getTime()
       })
 
       userRooms.value = rooms
       return rooms
     } catch (err) {
       console.error('Error fetching user rooms:', err)
+      // Log more details for debugging
+      if (err instanceof Error) {
+        console.error('Error message:', err.message)
+      }
       return []
     }
   }

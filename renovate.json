@@ -1,82 +1,121 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    ":dependencyDashboard",
-    ":semanticCommits",
-    ":automergeMinor",
-    ":automergeDigest",
-    "group:allNonMajor"
-  ],
-  "description": "Renovate config for Count Me In",
-  "labels": ["dependencies"],
-  "timezone": "Asia/Ho_Chi_Minh",
-  "schedule": ["before 9am on monday"],
-  "prHourlyLimit": 3,
-  "prConcurrentLimit": 5,
-  "packageRules": [
-    {
-      "description": "Auto-merge patch updates",
-      "matchUpdateTypes": ["patch", "pin", "digest"],
-      "automerge": true,
-      "automergeType": "pr",
-      "platformAutomerge": true
-    },
-    {
-      "description": "Auto-merge minor updates for dev dependencies",
-      "matchDepTypes": ["devDependencies"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true,
-      "automergeType": "pr",
-      "platformAutomerge": true
-    },
-    {
-      "description": "Group Vue ecosystem updates",
-      "matchPackagePatterns": ["^vue", "^@vue/", "^pinia", "^vue-router", "^vue-i18n"],
-      "groupName": "Vue ecosystem",
-      "groupSlug": "vue"
-    },
-    {
-      "description": "Group PrimeVue updates",
-      "matchPackagePatterns": ["^primevue", "^@primevue/", "^primeicons"],
-      "groupName": "PrimeVue",
-      "groupSlug": "primevue"
-    },
-    {
-      "description": "Group Firebase updates",
-      "matchPackagePatterns": ["^firebase"],
-      "groupName": "Firebase",
-      "groupSlug": "firebase"
-    },
-    {
-      "description": "Group ESLint updates",
-      "matchPackagePatterns": ["^eslint", "^@eslint/", "typescript-eslint"],
-      "groupName": "ESLint",
-      "groupSlug": "eslint"
-    },
-    {
-      "description": "Group Vite/Vitest updates",
-      "matchPackagePatterns": ["^vite", "^vitest", "^@vitejs/"],
-      "groupName": "Vite ecosystem",
-      "groupSlug": "vite"
-    },
-    {
-      "description": "Group TypeScript updates",
-      "matchPackagePatterns": ["^typescript", "^@types/"],
-      "groupName": "TypeScript",
-      "groupSlug": "typescript"
-    },
-    {
-      "description": "Major updates require manual review",
-      "matchUpdateTypes": ["major"],
-      "automerge": false,
-      "labels": ["dependencies", "major"]
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:recommended",
+        ":semanticCommits",
+        ":automergeMinor",
+        ":automergeDigest"
+    ],
+    "dependencyDashboard": true,
+    "dependencyDashboardTitle": "🔄 Dependency Dashboard",
+    "description": "Renovate config for Count Me In",
+    "labels": [
+        "dependencies"
+    ],
+    "timezone": "Asia/Ho_Chi_Minh",
+    "prHourlyLimit": 5,
+    "prConcurrentLimit": 10,
+    "packageRules": [
+        {
+            "description": "Auto-merge patch updates",
+            "matchUpdateTypes": [
+                "patch",
+                "pin",
+                "digest"
+            ],
+            "automerge": true,
+            "automergeType": "pr",
+            "platformAutomerge": true
+        },
+        {
+            "description": "Auto-merge minor updates for dev dependencies",
+            "matchDepTypes": [
+                "devDependencies"
+            ],
+            "matchUpdateTypes": [
+                "minor",
+                "patch"
+            ],
+            "automerge": true,
+            "automergeType": "pr",
+            "platformAutomerge": true
+        },
+        {
+            "description": "Group Vue ecosystem updates",
+            "matchPackagePatterns": [
+                "^vue",
+                "^@vue/",
+                "^pinia",
+                "^vue-router",
+                "^vue-i18n"
+            ],
+            "groupName": "Vue ecosystem",
+            "groupSlug": "vue"
+        },
+        {
+            "description": "Group PrimeVue updates",
+            "matchPackagePatterns": [
+                "^primevue",
+                "^@primevue/",
+                "^primeicons"
+            ],
+            "groupName": "PrimeVue",
+            "groupSlug": "primevue"
+        },
+        {
+            "description": "Group Firebase updates",
+            "matchPackagePatterns": [
+                "^firebase"
+            ],
+            "groupName": "Firebase",
+            "groupSlug": "firebase"
+        },
+        {
+            "description": "Group ESLint updates",
+            "matchPackagePatterns": [
+                "^eslint",
+                "^@eslint/",
+                "typescript-eslint"
+            ],
+            "groupName": "ESLint",
+            "groupSlug": "eslint"
+        },
+        {
+            "description": "Group Vite/Vitest updates",
+            "matchPackagePatterns": [
+                "^vite",
+                "^vitest",
+                "^@vitejs/"
+            ],
+            "groupName": "Vite ecosystem",
+            "groupSlug": "vite"
+        },
+        {
+            "description": "Group TypeScript updates",
+            "matchPackagePatterns": [
+                "^typescript",
+                "^@types/"
+            ],
+            "groupName": "TypeScript",
+            "groupSlug": "typescript"
+        },
+        {
+            "description": "Major updates require manual review",
+            "matchUpdateTypes": [
+                "major"
+            ],
+            "automerge": false,
+            "labels": [
+                "dependencies",
+                "major"
+            ]
+        }
+    ],
+    "vulnerabilityAlerts": {
+        "enabled": true,
+        "labels": [
+            "security"
+        ],
+        "automerge": true
     }
-  ],
-  "vulnerabilityAlerts": {
-    "enabled": true,
-    "labels": ["security"],
-    "automerge": true
-  }
 }
-

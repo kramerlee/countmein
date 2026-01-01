@@ -54,7 +54,10 @@ const activeQueue = computed(() => {
 
 const joinUrl = computed(() => {
   const baseUrl = window.location.origin
-  return `${baseUrl}/join/${props.roomId}`
+  const basePath = import.meta.env.BASE_URL || '/'
+  // Ensure basePath ends with / and doesn't duplicate
+  const normalizedBase = basePath.endsWith('/') ? basePath : `${basePath}/`
+  return `${baseUrl}${normalizedBase}join/${props.roomId}`
 })
 
 onMounted(async () => {

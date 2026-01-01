@@ -296,6 +296,14 @@ export const useRoomStore = defineStore('room', () => {
 
     try {
       const roomRef = doc(getDb(), 'rooms', roomId)
+      
+      // Find the "next" song in the queue (for auto-promotion)
+      const nextSong = currentRoom.value.queue.find(r => r.status === 'next')
+      
+      // Check if we're completing the ongoing song
+      const isCompletingOngoing = status === 'completed' && 
+        currentRoom.value.queue.find(r => r.id === requestId)?.status === 'ongoing'
+
       const updatedQueue = currentRoom.value.queue.map(r => {
         // If setting to 'next', clear any existing 'next' status
         if (status === 'next' && r.status === 'next' && r.id !== requestId) {
@@ -309,6 +317,10 @@ export const useRoomStore = defineStore('room', () => {
         if (r.id === requestId) {
           return { ...r, status }
         }
+        // Auto-promote: When completing ongoing, promote 'next' to 'ongoing'
+        if (isCompletingOngoing && nextSong && r.id === nextSong.id) {
+          return { ...r, status: 'ongoing' as const }
+        }
         return r
       })
 
@@ -316,6 +328,11 @@ export const useRoomStore = defineStore('room', () => {
       const firestoreQueue = updatedQueue.map(toFirestoreRequest)
 
       await updateDoc(roomRef, { queue: firestoreQueue })
+      
+      // Show notification if auto-promoted
+      if (isCompletingOngoing && nextSong) {
+        addNotification(`${nextSong.guestName} is now singing "${nextSong.songName}"`, 'info')
+      }
     } catch (err) {
       error.value = 'Failed to update status'
       console.error('Error updating request status:', err)

@@ -248,7 +248,9 @@ function handleLearnMore() {
       
       <div class="steps-container">
         <div class="step-card">
-          <div class="step-number">1</div>
+          <div class="step-number">
+            1
+          </div>
           <div class="step-content">
             <h3>{{ t('landing.step1Title') }}</h3>
             <p>{{ t('landing.step1Desc') }}</p>
@@ -263,7 +265,9 @@ function handleLearnMore() {
         </div>
         
         <div class="step-card">
-          <div class="step-number">2</div>
+          <div class="step-number">
+            2
+          </div>
           <div class="step-content">
             <h3>{{ t('landing.step2Title') }}</h3>
             <p>{{ t('landing.step2Desc') }}</p>
@@ -278,7 +282,9 @@ function handleLearnMore() {
         </div>
         
         <div class="step-card">
-          <div class="step-number">3</div>
+          <div class="step-number">
+            3
+          </div>
           <div class="step-content">
             <h3>{{ t('landing.step3Title') }}</h3>
             <p>{{ t('landing.step3Desc') }}</p>
@@ -293,7 +299,9 @@ function handleLearnMore() {
         </div>
         
         <div class="step-card highlight">
-          <div class="step-number">4</div>
+          <div class="step-number">
+            4
+          </div>
           <div class="step-content">
             <h3>{{ t('landing.step4Title') }}</h3>
             <p>{{ t('landing.step4Desc') }}</p>
@@ -391,7 +399,9 @@ function handleLearnMore() {
           <i class="pi pi-microphone" />
           <span>Count Me In</span>
         </div>
-        <p class="footer-tagline">{{ t('app.tagline') }}</p>
+        <p class="footer-tagline">
+          {{ t('app.tagline') }}
+        </p>
         <div class="footer-links">
           <a
             href="https://github.com/kramerlee/countmein"

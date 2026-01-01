@@ -83,7 +83,10 @@ export default {
     extend: 'Extend',
     extend24h: 'Extend room by 24 hours',
     roomExtended: 'Room Extended',
-    roomExtendedDetail: 'Room has been extended by 24 hours'
+    roomExtendedDetail: 'Room has been extended by 24 hours',
+    viewOnlyMode: 'View only - You are not the owner of this room',
+    unauthorized: 'Unauthorized',
+    notRoomOwner: 'Only the room owner can perform this action'
   },
   guest: {
     addSong: 'Add Your Song',

@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useRoomStore } from '@/stores/roomStore'
+import { useAuthStore } from '@/stores/authStore'
 import {
   trackLandingView,
   trackLandingCTA,
@@ -16,6 +17,7 @@ import InputText from 'primevue/inputtext'
 const { t } = useI18n()
 const router = useRouter()
 const roomStore = useRoomStore()
+const authStore = useAuthStore()
 
 const joinRoomId = ref('')
 const joinError = ref('')
@@ -23,6 +25,7 @@ const isCreating = ref(false)
 const isJoining = ref(false)
 
 const isConfigured = computed(() => roomStore.isConfigured)
+const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 // Track section visibility
 const trackedSections = new Set<string>()
@@ -66,10 +69,17 @@ onUnmounted(() => {
 })
 
 async function createRoom() {
+  // Require authentication to create rooms
+  if (!isAuthenticated.value) {
+    trackLandingCTA('get_started')
+    router.push({ name: 'Login', query: { redirect: '/host' } })
+    return
+  }
+
   trackRoomCreate(false) // Track attempt
   try {
     isCreating.value = true
-    const room = await roomStore.createRoom()
+    const room = await roomStore.createRoom(authStore.user?.uid)
     trackRoomCreate(true, room.id) // Track success
     router.push({ name: 'HostRoom', params: { roomId: room.id } })
   } catch {

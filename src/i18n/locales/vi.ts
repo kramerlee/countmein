@@ -83,7 +83,10 @@ export default {
     extend: 'Gia hạn',
     extend24h: 'Gia hạn phòng thêm 24 giờ',
     roomExtended: 'Đã gia hạn phòng',
-    roomExtendedDetail: 'Phòng đã được gia hạn thêm 24 giờ'
+    roomExtendedDetail: 'Phòng đã được gia hạn thêm 24 giờ',
+    viewOnlyMode: 'Chỉ xem - Bạn không phải là chủ phòng này',
+    unauthorized: 'Không có quyền',
+    notRoomOwner: 'Chỉ chủ phòng mới có thể thực hiện thao tác này'
   },
   guest: {
     addSong: 'Thêm Bài Hát',

@@ -2,16 +2,25 @@
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRoomStore } from '@/stores/roomStore'
+import { useAuthStore } from '@/stores/authStore'
 
 const router = useRouter()
 const roomStore = useRoomStore()
+const authStore = useAuthStore()
 
 onMounted(async () => {
+  // Require authentication to create rooms
+  if (!authStore.isAuthenticated || !authStore.user) {
+    router.replace({ name: 'Login', query: { redirect: '/host' } })
+    return
+  }
+
   try {
-    const room = await roomStore.createRoom()
+    // Create room with authenticated user's ID
+    const room = await roomStore.createRoom(authStore.user.uid)
     router.replace({ name: 'HostRoom', params: { roomId: room.id } })
   } catch {
-    router.replace({ name: 'Home' })
+    router.replace({ name: 'Dashboard' })
   }
 })
 </script>

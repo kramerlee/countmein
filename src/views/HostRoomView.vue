@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useRoomStore } from '@/stores/roomStore'
+import { useAuthStore } from '@/stores/authStore'
 import { useToast } from 'primevue/usetoast'
 import { trackQRCode, trackLinkCopy } from '@/utils/analytics'
 import QRCode from 'qrcode'
@@ -17,11 +18,13 @@ const props = defineProps<{
 const { t } = useI18n()
 const router = useRouter()
 const roomStore = useRoomStore()
+const authStore = useAuthStore()
 const toast = useToast()
 
 const qrCodeDataUrl = ref('')
 const showQrModal = ref(false)
 const activeTab = ref<'queue' | 'completed'>('queue')
+const isOwner = ref(false)
 
 const room = computed(() => roomStore.currentRoom)
 const queue = computed(() => roomStore.queue)
@@ -32,7 +35,20 @@ const completedRequests = computed(() => roomStore.completedRequests)
 const isLoading = computed(() => roomStore.isLoading)
 const expiresIn = computed(() => roomStore.expiresIn)
 
+// Check if current user is the room owner
+const canModify = computed(() => isOwner.value)
+
 async function extendRoom() {
+  if (!canModify.value) {
+    toast.add({
+      severity: 'error',
+      summary: t('host.unauthorized'),
+      detail: t('host.notRoomOwner'),
+      life: 3000
+    })
+    return
+  }
+  
   const success = await roomStore.extendRoomTTL(props.roomId)
   if (success) {
     toast.add({
@@ -74,7 +90,29 @@ onMounted(async () => {
     return
   }
 
+  // Check ownership after room data is loaded
+  checkOwnership()
+
   await generateQrCode()
+})
+
+// Check if current user owns this room
+function checkOwnership() {
+  if (!roomStore.currentRoom) {
+    isOwner.value = false
+    return
+  }
+
+  const userId = authStore.user?.uid
+  const roomOwnerId = roomStore.currentRoom.ownerId
+
+  // User is owner if they own the room OR have the hostId in localStorage (legacy)
+  isOwner.value = (userId && roomOwnerId === userId) || roomStore.isHost(props.roomId)
+}
+
+// Watch for room changes to re-check ownership
+watch(room, () => {
+  checkOwnership()
 })
 
 onUnmounted(() => {
@@ -153,10 +191,28 @@ function shareRoom() {
 }
 
 function updateStatus(requestId: string, status: SongRequest['status']) {
+  if (!canModify.value) {
+    toast.add({
+      severity: 'error',
+      summary: t('host.unauthorized'),
+      detail: t('host.notRoomOwner'),
+      life: 3000
+    })
+    return
+  }
   roomStore.updateRequestStatus(props.roomId, requestId, status)
 }
 
 function removeRequest(requestId: string) {
+  if (!canModify.value) {
+    toast.add({
+      severity: 'error',
+      summary: t('host.unauthorized'),
+      detail: t('host.notRoomOwner'),
+      life: 3000
+    })
+    return
+  }
   roomStore.removeRequest(props.roomId, requestId)
 }
 </script>
@@ -204,9 +260,18 @@ function removeRequest(requestId: string) {
         </div>
       </div>
 
+      <!-- Read-only Warning for Non-owners -->
+      <div
+        v-if="!canModify && room"
+        class="readonly-warning"
+      >
+        <i class="pi pi-eye" />
+        <span>{{ t('host.viewOnlyMode') }}</span>
+      </div>
+
       <!-- Room TTL Info -->
       <div
-        v-if="expiresIn"
+        v-if="expiresIn && canModify"
         class="room-ttl"
       >
         <div class="ttl-info">
@@ -319,6 +384,7 @@ function removeRequest(requestId: string) {
             :key="request.id"
             :request="request"
             :position="index + 1"
+            :readonly="!canModify"
             @update-status="(status) => updateStatus(request.id, status)"
             @remove="removeRequest(request.id)"
           />
@@ -351,7 +417,7 @@ function removeRequest(requestId: string) {
             :key="request.id"
             :request="request"
             :readonly="true"
-            @remove="removeRequest(request.id)"
+            @remove="canModify ? removeRequest(request.id) : null"
           />
         </TransitionGroup>
       </div>
@@ -380,6 +446,26 @@ function removeRequest(requestId: string) {
 
 .loading-state p {
   color: var(--text-secondary);
+}
+
+/* Read-only Warning */
+.readonly-warning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(234, 179, 8, 0.15);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  border-radius: var(--radius-md);
+  color: #ca8a04;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.readonly-warning i {
+  font-size: 1rem;
 }
 
 .room-header {

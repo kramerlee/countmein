@@ -28,7 +28,8 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/host',
     name: 'CreateRoom',
-    component: () => import('@/views/CreateRoomView.vue')
+    component: () => import('@/views/CreateRoomView.vue'),
+    meta: { requiresAuth: true }
   },
   {
     path: '/room/:roomId',

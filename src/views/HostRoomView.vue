@@ -30,6 +30,19 @@ const nextRequest = computed(() => roomStore.nextRequest)
 const ongoingRequest = computed(() => roomStore.ongoingRequest)
 const completedRequests = computed(() => roomStore.completedRequests)
 const isLoading = computed(() => roomStore.isLoading)
+const expiresIn = computed(() => roomStore.expiresIn)
+
+async function extendRoom() {
+  const success = await roomStore.extendRoomTTL(props.roomId)
+  if (success) {
+    toast.add({
+      severity: 'success',
+      summary: t('host.roomExtended'),
+      detail: t('host.roomExtendedDetail'),
+      life: 3000
+    })
+  }
+}
 
 const activeQueue = computed(() => {
   const items: SongRequest[] = []
@@ -186,6 +199,25 @@ function removeRequest(requestId: string) {
             @click="shareRoom"
           />
         </div>
+      </div>
+
+      <!-- Room TTL Info -->
+      <div
+        v-if="expiresIn"
+        class="room-ttl"
+      >
+        <div class="ttl-info">
+          <i class="pi pi-clock" />
+          <span>{{ t('host.expiresIn') }}: <strong>{{ expiresIn }}</strong></span>
+        </div>
+        <Button
+          v-tooltip.bottom="t('host.extend24h')"
+          icon="pi pi-plus"
+          :label="t('host.extend')"
+          class="extend-btn"
+          size="small"
+          @click="extendRoom"
+        />
       </div>
 
       <!-- QR Code Modal -->
@@ -355,7 +387,48 @@ function removeRequest(requestId: string) {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Room TTL */
+.room-ttl {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
   margin-bottom: 1.5rem;
+}
+
+.ttl-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.ttl-info i {
+  color: var(--accent-color);
+}
+
+.ttl-info strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.extend-btn {
+  background: var(--accent-light) !important;
+  border: 1px solid var(--accent-color) !important;
+  color: var(--accent-color) !important;
+  font-size: 0.75rem !important;
+}
+
+.extend-btn:hover {
+  background: var(--accent-color) !important;
+  color: white !important;
 }
 
 .room-label {

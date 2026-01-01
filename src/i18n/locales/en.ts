@@ -78,7 +78,12 @@ export default {
     roomNotFound: 'Room not found',
     roomNotExist: 'This room does not exist',
     newRequest: 'New Request!',
-    wantsToSing: 'wants to sing'
+    wantsToSing: 'wants to sing',
+    expiresIn: 'Expires in',
+    extend: 'Extend',
+    extend24h: 'Extend room by 24 hours',
+    roomExtended: 'Room Extended',
+    roomExtendedDetail: 'Room has been extended by 24 hours'
   },
   guest: {
     addSong: 'Add Your Song',

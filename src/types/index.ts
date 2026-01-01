@@ -11,8 +11,12 @@ export interface Room {
   id: string
   hostId: string
   createdAt: Date
+  expiresAt: Date  // TTL - room will be auto-deleted after this time
   queue: SongRequest[]
 }
+
+// Room TTL configuration
+export const ROOM_TTL_HOURS = 24 // Rooms expire after 24 hours
 
 export interface Notification {
   id: string

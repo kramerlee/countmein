@@ -13,6 +13,7 @@ import {
 } from 'firebase/firestore'
 import { getDb, isFirebaseConfigured } from '@/firebase'
 import type { Room, SongRequest, Notification } from '@/types'
+import { ROOM_TTL_HOURS } from '@/types'
 
 function generateRoomId(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -82,11 +83,14 @@ export const useRoomStore = defineStore('room', () => {
   async function createRoom(): Promise<Room> {
     const roomId = generateRoomId()
     const hostId = generateHostId()
+    const now = new Date()
+    const expiresAt = new Date(now.getTime() + ROOM_TTL_HOURS * 60 * 60 * 1000)
 
     const room: Room = {
       id: roomId,
       hostId,
-      createdAt: new Date(),
+      createdAt: now,
+      expiresAt,
       queue: []
     }
 
@@ -96,7 +100,8 @@ export const useRoomStore = defineStore('room', () => {
 
       await setDoc(doc(getDb(), 'rooms', roomId), {
         ...room,
-        createdAt: Timestamp.fromDate(room.createdAt)
+        createdAt: Timestamp.fromDate(room.createdAt),
+        expiresAt: Timestamp.fromDate(room.expiresAt)
       })
 
       currentHostId.value = hostId
@@ -365,6 +370,50 @@ export const useRoomStore = defineStore('room', () => {
     return savedHostId !== null && savedHostId === currentHostId.value
   }
 
+  // Computed: time remaining until room expires
+  const expiresIn = computed(() => {
+    if (!currentRoom.value?.expiresAt) return null
+    const now = new Date()
+    const expiresAt = currentRoom.value.expiresAt instanceof Date 
+      ? currentRoom.value.expiresAt 
+      : new Date(currentRoom.value.expiresAt)
+    const diff = expiresAt.getTime() - now.getTime()
+    if (diff <= 0) return 'Expired'
+    
+    const hours = Math.floor(diff / (1000 * 60 * 60))
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+    
+    if (hours > 0) return `${hours}h ${minutes}m`
+    return `${minutes}m`
+  })
+
+  // Extend room TTL by specified hours (default: 24 hours)
+  async function extendRoomTTL(roomId: string, hours: number = ROOM_TTL_HOURS): Promise<boolean> {
+    if (!currentRoom.value) return false
+
+    try {
+      const roomRef = doc(getDb(), 'rooms', roomId)
+      const currentExpiry = currentRoom.value.expiresAt instanceof Date 
+        ? currentRoom.value.expiresAt 
+        : new Date(currentRoom.value.expiresAt)
+      
+      // Extend from current expiry or now, whichever is later
+      const baseTime = Math.max(currentExpiry.getTime(), Date.now())
+      const newExpiresAt = new Date(baseTime + hours * 60 * 60 * 1000)
+
+      await updateDoc(roomRef, {
+        expiresAt: Timestamp.fromDate(newExpiresAt)
+      })
+
+      addNotification(`Room extended by ${hours} hours`, 'success')
+      return true
+    } catch (err) {
+      error.value = 'Failed to extend room'
+      console.error('Error extending room TTL:', err)
+      return false
+    }
+  }
+
   return {
     currentRoom,
     notifications,
@@ -377,6 +426,7 @@ export const useRoomStore = defineStore('room', () => {
     nextRequest,
     ongoingRequest,
     completedRequests,
+    expiresIn,
     createRoom,
     subscribeToRoom,
     roomExists,
@@ -386,6 +436,7 @@ export const useRoomStore = defineStore('room', () => {
     addNotification,
     removeNotification,
     unsubscribeFromRoom,
-    isHost
+    isHost,
+    extendRoomTTL
   }
 })

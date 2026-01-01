@@ -78,7 +78,12 @@ export default {
     roomNotFound: 'Không tìm thấy phòng',
     roomNotExist: 'Phòng này không tồn tại',
     newRequest: 'Yêu cầu mới!',
-    wantsToSing: 'muốn hát'
+    wantsToSing: 'muốn hát',
+    expiresIn: 'Hết hạn sau',
+    extend: 'Gia hạn',
+    extend24h: 'Gia hạn phòng thêm 24 giờ',
+    roomExtended: 'Đã gia hạn phòng',
+    roomExtendedDetail: 'Phòng đã được gia hạn thêm 24 giờ'
   },
   guest: {
     addSong: 'Thêm Bài Hát',
